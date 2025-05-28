@@ -1,0 +1,125 @@
+#include "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+
+const int M1_IN1 = 32;
+const int M1_IN2 = 33;
+const int M2_IN1 = 2;
+const int M2_IN2 = 4;
+
+void forward() {
+  digitalWrite(M1_IN1, LOW);
+  digitalWrite(M1_IN2, HIGH);
+  digitalWrite(M2_IN1, LOW);
+  digitalWrite(M2_IN2, HIGH);
+}
+
+void back() {
+  digitalWrite(M1_IN1, HIGH);
+  digitalWrite(M1_IN2, LOW);
+  digitalWrite(M2_IN1, HIGH);
+  digitalWrite(M2_IN2, LOW);
+}
+
+void left() {
+  digitalWrite(M1_IN1, LOW);
+  digitalWrite(M1_IN2, HIGH);
+  digitalWrite(M2_IN1, HIGH);
+  digitalWrite(M2_IN2, LOW);
+}
+
+void right() {
+  digitalWrite(M1_IN1, HIGH);
+  digitalWrite(M1_IN2, LOW);
+  digitalWrite(M2_IN1, LOW);
+  digitalWrite(M2_IN2, HIGH);
+}
+
+void rotateCW() {
+  digitalWrite(M1_IN1, HIGH);
+  digitalWrite(M1_IN2, LOW);
+  digitalWrite(M2_IN1, LOW);
+  digitalWrite(M2_IN2, HIGH);
+}
+
+void rotateCCW() {
+  digitalWrite(M1_IN1, LOW);
+  digitalWrite(M1_IN2, HIGH);
+  digitalWrite(M2_IN1, HIGH);
+  digitalWrite(M2_IN2, LOW);
+}
+
+void Stop() {
+  digitalWrite(M1_IN1, LOW);
+  digitalWrite(M1_IN2, LOW);
+  digitalWrite(M2_IN1, LOW);
+  digitalWrite(M2_IN2, LOW);
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Inicializando...");
+
+  pinMode(M1_IN1, OUTPUT);
+  pinMode(M1_IN2, OUTPUT);
+  pinMode(M2_IN1, OUTPUT);
+  pinMode(M2_IN2, OUTPUT);
+
+  SerialBT.begin("Equipe 12");
+  Serial.println("Bluetooth iniciado como Equipe XXXXX");
+
+  Stop();
+}
+
+void loop() {
+  if (SerialBT.available() > 0) {
+    char comando = SerialBT.read();
+
+    // Ignora caracteres de nova linha ou retorno de carro
+    if (comando == '\n' || comando == '\r') {
+      return;
+    }
+
+    Serial.print("Comando recebido: ");
+    Serial.println(comando);
+
+    Stop();
+
+    switch (comando) {
+      case '8':
+        forward();
+        Serial.println("Movendo: frente");
+        break;
+      case '2':
+        back();
+        Serial.println("Movendo: trás");
+        break;
+      case '4':
+        left();
+        Serial.println("Movendo: esquerda");
+        break;
+      case '6':
+        right();
+        Serial.println("Movendo: direita");
+        break;
+      case 'T':
+        rotateCW();
+        Serial.println("Rotação: horário");
+        break;
+      case 'B':
+        rotateCCW();
+        Serial.println("Rotação: anti-horário");
+        break;
+      case 'Q':
+        Serial.println("Comando Q executado");
+        break;
+      case 'X':
+        Stop();
+        Serial.println("Parando");
+        break;
+      default:
+        Serial.println("Comando desconhecido");
+        break;
+    }
+  }
+}
